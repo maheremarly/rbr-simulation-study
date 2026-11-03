@@ -1,0 +1,36 @@
+Package: rbr.simulation.study
+Title: A Simulation Study on the Stability and Recovery Behaviour of a
+    Relative Belief Ratio Filter for Binary Feature Selection
+Version: 1.0.0
+Authors@R: c(
+    person("Maher", "Emarly", email = "maheremarly1@gmail.com", role = c("aut", "cre")),
+    person("Ayman", "Alzaatreh", role = "aut"),
+    person("Luai", "Al-Labadi", role = "aut"),
+    person("Firuz", "Kamalov", role = "aut"))
+Description: Code for the paper of the same name (preprint,
+    doi:10.21203/rs.3.rs-10883318/v1). A controlled Monte Carlo study of the
+    relative belief ratio filter against Information Gain, Symmetrical
+    Uncertainty, mRMR, ReliefF and Boruta, on synthetic data where the
+    informative, redundant and noise features are fixed by construction. Seven
+    data-generating scenarios, four design cells varying sample size and
+    dimensionality one factor at a time, and 300 independent datasets per cell
+    and scenario. Reports informative-feature recovery, noise FDR, and selection
+    stability by the Jaccard and Kuncheva indices. This is a research project,
+    not an installable package: the modules in R/ are sourced by the entry
+    points in scripts/.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 4.0.0)
+Imports:
+    Boruta,
+    CORElearn,
+    dplyr,
+    FSelector,
+    ggplot2,
+    openxlsx,
+    praznik,
+    purrr,
+    tidyr,
+    yaml
+SystemRequirements: Java (>= 8), required by FSelector via RWeka

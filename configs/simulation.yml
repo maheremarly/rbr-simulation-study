@@ -1,0 +1,59 @@
+# The simulation design: shared settings, the four design cells, and the
+# scenario list.
+#
+# p_inf and p_red are fixed in COUNT, not as a fraction of p. At p = 1000 the 30
+# relevant features are 3% of the total, which is a deliberate high-dimensional
+# screening stress test and is stated as such in the paper. p = 2000 was
+# considered and rejected as too expensive; do not add it.
+
+base:
+  # Feature structure, shared by every cell and every scenario.
+  p_inf: 25            # informative
+  p_red: 5             # redundant but relevant, correlated with an informative one
+  class_prob: {"1": 0.50, "2": 0.50}
+
+  # Independent datasets per scenario. Fixed at 300 for every cell.
+  n_sims: 300
+
+  # RBR internal Monte Carlo. This is not a bootstrap: B_rbr posterior draws per
+  # feature, against a prior cache of the same size built once per run.
+  B_rbr: 5000
+  M_rbr: 100
+
+  # Endpoints. top_k_core must equal p_inf, top_k_all must equal p_inf + p_red.
+  top_k_core: 25       # recovery of the informative features
+  top_k_all: 30        # recovery of all relevant features
+
+  # Only this many ranks per method are written to the report, not all p.
+  save_top_n: 50
+
+  relief_iterations: 100
+  boruta_maxRuns: 100
+
+  # Cell seeds are seed_base + 10^7 * (cell position below), so the per-dataset
+  # seeds can never collide across cells. The prior cache uses seed_base + 999.
+  seed_base: 101
+
+# One-factor-at-a-time cross design. A to C vary n at fixed p = 500; A against D
+# varies p at fixed n = 100. ORDER MATTERS: a cell's seed stream is derived from
+# its position in this list, so reordering or inserting a cell changes its
+# random numbers.
+# `n_obs`, not `n`: a bare `n` key is read as the YAML 1.1 boolean `no`, which
+# would silently give a cell no sample size at all.
+cells:
+  A: {n_obs: 100, p: 500,  role: "baseline (shared reference)"}
+  B: {n_obs: 50,  p: 500,  role: "sample size down"}
+  C: {n_obs: 200, p: 500,  role: "sample size up"}
+  D: {n_obs: 100, p: 1000, role: "dimensionality up"}
+
+# The scenario run list. ORDER MATTERS for the same reason: a dataset's seed is
+# derived from its scenario's position here, so the numbers only reproduce if
+# this list is left as it is. Running a subset with --scenarios does not change
+# the seeds, because the position is always taken from this full list.
+scenarios:
+  # Core positive claim: marginal location signal across diverse distributions.
+  - mean_shift_independent      # Fan & Fan (2008), Gaussian location baseline
+  - correlated_gaussian_blocks  # Fan & Lv (2008), correlated location signal
+  - heavy_tailed_meanshift      # t_3 within-class location, robustness
+  - skewed_meanshift            # log-normal right skew plus a class shift
+  - mixture_meanshift           # bimodal within class plus a class shift, harder
